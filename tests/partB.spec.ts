@@ -1,8 +1,6 @@
 import { type Locator, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { test, expect } from '../fixtures/practice.fixture';
-
-// Register before clicking so the dialog is handled without blocking the click.
 async function respondToDialog(
   page: Page,
   button: Locator,
@@ -21,7 +19,6 @@ async function respondToDialog(
   await button.click();
   return await handledDialog;
 }
-
 test.describe('Part B — Interactive Controls', () => {
   test('B1: double-click Copy Text and verify Field2 matches Field1', async ({ practice }) => {
     await practice.field1.fill('Fictional copy text');

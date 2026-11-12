@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures/practice.fixture';
-
 test.describe('Part A — Form Interactions and Assertions', () => {
   test('A1: verify the page title and URL', async ({ practice }) => {
     await expect(
