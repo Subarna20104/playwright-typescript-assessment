@@ -1,6 +1,6 @@
 # Playwright Assessment
 
-Automated tests for [Automation Testing Practice](https://testautomationpractice.blogspot.com/), written in TypeScript using Playwright Test. Each part runs in its own single test block, with each exercise grouped using `test.step()`, simple ID and role locators, and soft assertions.
+Automated tests for [Automation Testing Practice](https://testautomationpractice.blogspot.com/), written in TypeScript using Playwright Test. Each part runs in its own single test block, using a shared fixture, Page Object Model, simple ID and role locators, and soft assertions. Part B groups its exercises using `test.step()`.
 
 ## Setup
 
@@ -53,9 +53,9 @@ npx tsc --noEmit
 npm run report
 ```
 
-Each file uses `test.beforeEach()` to open the page and read its initial ARIA snapshot. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
+The shared `practice` fixture creates a `PracticePage` and opens the website once per test. Part B uses `test.beforeEach()` to read its initial ARIA snapshot. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. Part B’s `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
 
-The HTML report includes both test cases, their named steps, assertions, initial ARIA snapshots, and final screenshots. After running `npm test`, open it with `npm run report`.
+The HTML report includes both test cases and their assertions, plus Part B’s named steps, initial ARIA snapshot, and final screenshot. After running `npm test`, open it with `npm run report`.
 
 ## Test coverage
 
@@ -91,6 +91,8 @@ The interactive exercises cover eight requirements, including both confirmation 
 ## Project structure
 
 ```text
+fixtures/practice.fixture.ts  Shared practice page fixture
+pages/PracticePage.ts         Simple locators and reusable actions
 tests/partA.spec.ts            Part A in a single test block
 tests/partB.spec.ts            Part B in a single test block
 tests/data/sample-upload.txt  Prepared upload sample
