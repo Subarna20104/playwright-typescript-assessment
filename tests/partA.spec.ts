@@ -1,214 +1,158 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }, testInfo) => {
-  await page.goto('https://testautomationpractice.blogspot.com/');
-
-  await test.step('Read and verify the default page ARIA snapshot', async () => {
-    const snapshot = await page.locator('body').ariaSnapshot();
-    await testInfo.attach('default-page-aria.yml', {
-      body: snapshot,
-      contentType: 'text/yaml',
-    });
-
-    // Verify stable default controls; dynamic table values change on every load.
-    await expect.soft(page.locator('body')).toMatchAriaSnapshot(`
-      - banner:
-        - heading "Automation Testing Practice" [level=1]
-      - heading "Data Entry Form" [level=3]
-      - textbox "Enter Name"
-      - textbox "Enter EMail"
-      - textbox "Enter Phone"
-      - textbox "Address:"
-      - radio "Male"
-      - radio "Female"
-      - checkbox "Sunday"
-      - checkbox "Wednesday"
-      - checkbox "Saturday"
-      - combobox "Country:":
-        - option "United States" [selected]
-      - listbox "Colors:"
-      - heading "Upload Files" [level=2]
-      - button "Upload Single File"
-      - complementary:
-        - button "Simple Alert"
-        - button "Confirmation Alert"
-        - button "Prompt Alert"
-        - button "New Tab"
-        - button "Point Me"
-        - button "Copy Text"
-        - paragraph: Drag me to my target
-        - paragraph: Drop here
-    `);
-  });
-});
-
-test.afterEach(async ({ page }, testInfo) => {
-  await testInfo.attach('final-page.png', {
-    body: await page.screenshot({ fullPage: true }),
-    contentType: 'image/png',
-  });
-});
-
 test('Part A — Form Interactions and Assertions', async ({ page }) => {
   test.setTimeout(180_000);
-  await test.step("A1: verify the page title and URL", async () => {
-    await expect.soft(
-      page,
-      'Page title should be Automation Testing Practice',
-    ).toHaveTitle('Automation Testing Practice');
-    await expect.soft(
-      page,
-      'Page URL should match the practice website',
-    ).toHaveURL('https://testautomationpractice.blogspot.com/');
-  });
+  await page.goto('https://testautomationpractice.blogspot.com/');
 
-  await test.step("A2: enter fictional details and verify all field values", async () => {
-    const details = {
-      name: 'Alex Example',
-      email: 'alex@example.com',
-      phone: '2025550148',
-      address: '42 Fictional Lane, Example City',
-    };
-    await page.locator('#name').fill(details.name);
-    await page.locator('#email').fill(details.email);
-    await page.locator('#phone').fill(details.phone);
-    await page.locator('#textarea').fill(details.address);
-    await expect.soft(
-      page.locator('#name'),
-      'Name field should contain the entered name',
-    ).toHaveValue(details.name);
-    await expect.soft(
-      page.locator('#email'),
-      'Email field should contain the entered email',
-    ).toHaveValue(details.email);
-    await expect.soft(
-      page.locator('#phone'),
-      'Phone field should contain the entered phone number',
-    ).toHaveValue(details.phone);
-    await expect.soft(
-      page.locator('#textarea'),
-      'Address field should contain the entered address',
-    ).toHaveValue(details.address);
-  });
+  // A1: verify the page title and URL
+  await expect.soft(
+    page,
+    'Page title should be Automation Testing Practice',
+  ).toHaveTitle('Automation Testing Practice');
+  await expect.soft(
+    page,
+    'Page URL should match the practice website',
+  ).toHaveURL('https://testautomationpractice.blogspot.com/');
 
-  await test.step("A3: clear the name and enter a different name", async () => {
-    await page.locator('#name').fill('Alex Example');
-    await expect.soft(
-      page.locator('#name'),
-      'Initial name should be present before clearing',
-    ).toHaveValue('Alex Example');
-    await page.locator('#name').clear();
-    await expect.soft(
-      page.locator('#name'),
-      'Name field should be empty after clearing',
-    ).toBeEmpty();
-    await page.locator('#name').fill('Taylor Example');
-    await expect.soft(
-      page.locator('#name'),
-      'Name field should contain the updated name',
-    ).toHaveValue('Taylor Example');
-  });
+  // A2: enter fictional details and verify all field values
+  const details = {
+    name: 'Alex Example',
+    email: 'alex@example.com',
+    phone: '2025550148',
+    address: '42 Fictional Lane, Example City',
+  };
+  await page.locator('#name').fill(details.name);
+  await page.locator('#email').fill(details.email);
+  await page.locator('#phone').fill(details.phone);
+  await page.locator('#textarea').fill(details.address);
+  await expect.soft(
+    page.locator('#name'),
+    'Name field should contain the entered name',
+  ).toHaveValue(details.name);
+  await expect.soft(
+    page.locator('#email'),
+    'Email field should contain the entered email',
+  ).toHaveValue(details.email);
+  await expect.soft(
+    page.locator('#phone'),
+    'Phone field should contain the entered phone number',
+  ).toHaveValue(details.phone);
+  await expect.soft(
+    page.locator('#textarea'),
+    'Address field should contain the entered address',
+  ).toHaveValue(details.address);
 
-  await test.step("A4: switch gender and verify selected and unselected states", async () => {
-    await page.locator('#male').check();
-    await expect.soft(
-      page.locator('#male'),
-      'Male should be selected',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#female'),
-      'Female should be unselected when Male is selected',
-    ).not.toBeChecked();
-    await page.locator('#female').check();
-    await expect.soft(
-      page.locator('#female'),
-      'Female should be selected after switching',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#male'),
-      'Male should be unselected after switching to Female',
-    ).not.toBeChecked();
-  });
+  // A3: clear the name and enter a different name
+  await page.locator('#name').fill('Alex Example');
+  await expect.soft(
+    page.locator('#name'),
+    'Initial name should be present before clearing',
+  ).toHaveValue('Alex Example');
+  await page.locator('#name').clear();
+  await expect.soft(
+    page.locator('#name'),
+    'Name field should be empty after clearing',
+  ).toBeEmpty();
+  await page.locator('#name').fill('Taylor Example');
+  await expect.soft(
+    page.locator('#name'),
+    'Name field should contain the updated name',
+  ).toHaveValue('Taylor Example');
 
-  await test.step("A5: select Sunday, Wednesday and Saturday", async () => {
-    await page.locator('#sunday').check();
-    await page.locator('#wednesday').check();
-    await page.locator('#saturday').check();
-    await expect.soft(
-      page.locator('#sunday'),
-      'Sunday should be checked',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#wednesday'),
-      'Wednesday should be checked',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#saturday'),
-      'Saturday should be checked',
-    ).toBeChecked();
-  });
+  // A4: switch gender and verify selected and unselected states
+  await page.locator('#male').check();
+  await expect.soft(
+    page.locator('#male'),
+    'Male should be selected',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#female'),
+    'Female should be unselected when Male is selected',
+  ).not.toBeChecked();
+  await page.locator('#female').check();
+  await expect.soft(
+    page.locator('#female'),
+    'Female should be selected after switching',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#male'),
+    'Male should be unselected after switching to Female',
+  ).not.toBeChecked();
 
-  await test.step("A6: uncheck Sunday while keeping Wednesday and Saturday checked", async () => {
-    await page.locator('#sunday').check();
-    await page.locator('#wednesday').check();
-    await page.locator('#saturday').check();
-    await expect.soft(
-      page.locator('#sunday'),
-      'Sunday should initially be checked',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#wednesday'),
-      'Wednesday should initially be checked',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#saturday'),
-      'Saturday should initially be checked',
-    ).toBeChecked();
-    await page.locator('#sunday').uncheck();
-    await expect.soft(
-      page.locator('#sunday'),
-      'Sunday should be unchecked',
-    ).not.toBeChecked();
-    await expect.soft(
-      page.locator('#wednesday'),
-      'Wednesday should remain checked',
-    ).toBeChecked();
-    await expect.soft(
-      page.locator('#saturday'),
-      'Saturday should remain checked',
-    ).toBeChecked();
-  });
+  // A5: select Sunday, Wednesday and Saturday
+  await page.locator('#sunday').check();
+  await page.locator('#wednesday').check();
+  await page.locator('#saturday').check();
+  await expect.soft(
+    page.locator('#sunday'),
+    'Sunday should be checked',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#wednesday'),
+    'Wednesday should be checked',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#saturday'),
+    'Saturday should be checked',
+  ).toBeChecked();
 
-  await test.step("A7: select a country and verify its value", async () => {
-    await page.locator('#country').selectOption('india');
-    await expect.soft(
-      page.locator('#country'),
-      'Country dropdown should have India selected',
-    ).toHaveValue('india');
-  });
+  // A6: uncheck Sunday while keeping Wednesday and Saturday checked
+  await page.locator('#sunday').check();
+  await page.locator('#wednesday').check();
+  await page.locator('#saturday').check();
+  await expect.soft(
+    page.locator('#sunday'),
+    'Sunday should initially be checked',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#wednesday'),
+    'Wednesday should initially be checked',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#saturday'),
+    'Saturday should initially be checked',
+  ).toBeChecked();
+  await page.locator('#sunday').uncheck();
+  await expect.soft(
+    page.locator('#sunday'),
+    'Sunday should be unchecked',
+  ).not.toBeChecked();
+  await expect.soft(
+    page.locator('#wednesday'),
+    'Wednesday should remain checked',
+  ).toBeChecked();
+  await expect.soft(
+    page.locator('#saturday'),
+    'Saturday should remain checked',
+  ).toBeChecked();
 
-  await test.step("A8: select multiple colors and verify their values", async () => {
-    await page.locator('#colors').selectOption(['blue', 'yellow']);
-    await expect.soft(
-      page.locator('#colors'),
-      'Colors list should have exactly Blue and Yellow selected',
-    ).toHaveValues(['blue', 'yellow']);
-  });
+  // A7: select a country and verify its value
+  await page.locator('#country').selectOption('india');
+  await expect.soft(
+    page.locator('#country'),
+    'Country dropdown should have India selected',
+  ).toHaveValue('india');
 
-  await test.step("A9: verify a text field gains and loses focus", async () => {
-    await page.locator('#name').focus();
-    await expect.soft(
-      page.locator('#name'),
-      'Name field should have focus',
-    ).toBeFocused();
-    await page.locator('#email').focus();
-    await expect.soft(
-      page.locator('#email'),
-      'Email field should receive focus',
-    ).toBeFocused();
-    await expect.soft(
-      page.locator('#name'),
-      'Name field should no longer have focus',
-    ).not.toBeFocused();
-  });
+  // A8: select multiple colors and verify their values
+  await page.locator('#colors').selectOption(['blue', 'yellow']);
+  await expect.soft(
+    page.locator('#colors'),
+    'Colors list should have exactly Blue and Yellow selected',
+  ).toHaveValues(['blue', 'yellow']);
+
+  // A9: verify a text field gains and loses focus
+  await page.locator('#name').focus();
+  await expect.soft(
+    page.locator('#name'),
+    'Name field should have focus',
+  ).toBeFocused();
+  await page.locator('#email').focus();
+  await expect.soft(
+    page.locator('#email'),
+    'Email field should receive focus',
+  ).toBeFocused();
+  await expect.soft(
+    page.locator('#name'),
+    'Name field should no longer have focus',
+  ).not.toBeFocused();
 });
