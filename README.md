@@ -53,6 +53,10 @@ npx tsc --noEmit
 npm run report
 ```
 
+Each file uses `test.beforeEach()` to open the page and read its initial ARIA snapshot. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
+
+The HTML report includes both test cases, their named steps, assertions, initial ARIA snapshots, and final screenshots. After running `npm test`, open it with `npm run report`.
+
 ## Test coverage
 
 Part A and Part B run independently, with one test block per file. Every assertion uses `expect.soft()` so assertion failures are recorded while the test continues. Action failures can still stop execution.

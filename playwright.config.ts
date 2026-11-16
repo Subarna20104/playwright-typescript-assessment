@@ -4,7 +4,7 @@ const slowMo = Number(process.env.SLOW_MO ?? 0);
 
 export default defineConfig({
   testDir: './tests',
-  timeout: slowMo > 0 ? 60_000 : 30_000,
+  timeout: 180_000,
   expect: {
     timeout: 5_000,
   },
