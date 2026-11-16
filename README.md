@@ -1,6 +1,6 @@
 # Playwright Assessment
 
-Automated tests for [Automation Testing Practice](https://testautomationpractice.blogspot.com/), written in TypeScript using Playwright Test and a Page Object Model.
+Automated tests for [Automation Testing Practice](https://testautomationpractice.blogspot.com/), written in TypeScript using Playwright Test. Each part runs in its own single test block, with each exercise grouped using `test.step()`, simple ID and role locators, and soft assertions.
 
 ## Setup
 
@@ -19,17 +19,17 @@ Run all tests headlessly:
 npm test
 ```
 
-Watch both parts in a visible browser, with a 700 ms delay between browser actions and one test running at a time:
+Watch the assessment in a visible browser, with a 700 ms delay between browser actions and one test running at a time:
 
 ```bash
 npm run test:headed
 ```
 
-Run either part separately in the visible browser:
+Run either part separately:
 
 ```bash
-npm run test:headed -- tests/partA.spec.ts
-npm run test:headed -- tests/partB.spec.ts
+npx playwright test tests/partA.spec.ts
+npx playwright test tests/partB.spec.ts
 ```
 
 The headed script uses macOS/Linux environment variable syntax. On Windows PowerShell, use:
@@ -55,11 +55,11 @@ npm run report
 
 ## Test coverage
 
-Both parts belong to the same project. There are 18 tests in total.
+Part A and Part B run independently, with one test block per file. Every assertion uses `expect.soft()` so assertion failures are recorded while the test continues. Action failures can still stop execution.
 
 ### Part A — Form Interactions and Assertions
 
-Nine tests cover:
+The form exercises cover:
 
 1. Page title and URL.
 2. Fictional name, email, phone number, and address, with value assertions.
@@ -73,7 +73,7 @@ Nine tests cover:
 
 ### Part B — Interactive Controls
 
-Nine tests cover eight requirements; confirmation acceptance and dismissal are separate tests:
+The interactive exercises cover eight requirements, including both confirmation responses:
 
 1. Double-clicking Copy Text and checking that Field2 matches Field1.
 2. Hovering over Point Me to reveal a menu option.
@@ -87,15 +87,13 @@ Nine tests cover eight requirements; confirmation acceptance and dismissal are s
 ## Project structure
 
 ```text
-fixtures/practice.fixture.ts   Shared fixture that opens the practice page
-pages/PracticePage.ts          Page locators and reusable actions
-tests/partA.spec.ts            Form interaction tests
-tests/partB.spec.ts            Interactive control tests
+tests/partA.spec.ts            Part A in a single test block
+tests/partB.spec.ts            Part B in a single test block
 tests/data/sample-upload.txt  Prepared upload sample
 playwright.config.ts          Browser, timeout, and report configuration
 tsconfig.json                 TypeScript configuration
 ```
 
-Tests use Chromium and require internet access to the practice website and the new-tab destination. Each test opens a fresh page through the shared fixture and can run independently.
+Tests use Chromium and require internet access to the practice website and the new-tab destination. Each part opens its own practice page and completes its exercises in order.
 
 Generated reports, test results, and `node_modules` are excluded from Git. Screenshots and traces are retained for failed tests.

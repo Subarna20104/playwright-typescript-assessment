@@ -1,93 +1,89 @@
-import { type Locator, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { resolve } from 'node:path';
-import { test, expect } from '../fixtures/practice.fixture';
-async function respondToDialog(
-  page: Page,
-  button: Locator,
-  response: 'accept' | 'dismiss',
-  promptText?: string,
-) {
-  const handledDialog = page.waitForEvent('dialog').then(async (dialog) => {
-    const details = { type: dialog.type(), message: dialog.message() };
-    if (response === 'accept') {
-      await dialog.accept(promptText);
-    } else {
+
+test('Part B — Interactive Controls', async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.goto('https://testautomationpractice.blogspot.com/');
+
+  await test.step("B1: Double-click to copy text.", async () => {
+    await page.locator('#field1').fill('Fictional copy text');
+    await page.locator('#field2').fill('Previous value');
+    const originalText = await page.locator('#field1').inputValue();
+    await page.getByRole('button', { name: 'Copy Text', exact: true }).dblclick();
+    await expect.soft(page.locator('#field2')).toHaveValue(originalText);
+  });
+
+  await test.step("B2: Hover to reveal the menu.", async () => {
+    await expect.soft(page.getByRole('link', { name: 'Mobiles', exact: true })).toBeHidden();
+    await page.getByRole('button', { name: 'Point Me', exact: true }).hover();
+    await expect.soft(page.getByRole('link', { name: 'Mobiles', exact: true })).toBeVisible();
+  });
+
+  await test.step("B3: Drag and drop.", async () => {
+    await expect.soft(page.locator('#droppable')).toHaveText('Drop here');
+    await page.locator('#draggable').dragTo(page.locator('#droppable'));
+    await expect.soft(page.locator('#droppable')).toHaveText('Dropped!');
+    await expect.soft(page.locator('#droppable')).toHaveClass(/ui-state-highlight/);
+  });
+
+  await test.step("B4: Accept the simple alert.", async () => {
+    const alertHandled = page.waitForEvent('dialog').then(async (dialog) => {
+      expect.soft(dialog.type()).toBe('alert');
+      expect.soft(dialog.message()).toBe('I am an alert box!');
+      await dialog.accept();
+    });
+    await page.getByRole('button', { name: 'Simple Alert', exact: true }).click();
+    await alertHandled;
+  });
+
+  await test.step("B5a: Accept the confirmation.", async () => {
+    const confirmAccepted = page.waitForEvent('dialog').then(async (dialog) => {
+      expect.soft(dialog.type()).toBe('confirm');
+      expect.soft(dialog.message()).toBe('Press a button!');
+      await dialog.accept();
+    });
+    await page.getByRole('button', { name: 'Confirmation Alert', exact: true }).click();
+    await confirmAccepted;
+    await expect.soft(page.locator('#demo')).toHaveText('You pressed OK!');
+  });
+
+  await test.step("B5b: Dismiss the confirmation.", async () => {
+    const confirmDismissed = page.waitForEvent('dialog').then(async (dialog) => {
+      expect.soft(dialog.type()).toBe('confirm');
+      expect.soft(dialog.message()).toBe('Press a button!');
       await dialog.dismiss();
-    }
-    return details;
-  });
-  await button.click();
-  return await handledDialog;
-}
-test.describe('Part B — Interactive Controls', () => {
-  test('B1: double-click Copy Text and verify Field2 matches Field1', async ({ practice }) => {
-    await practice.field1.fill('Fictional copy text');
-    await practice.field2.fill('Previous value');
-    const originalText = await practice.field1.inputValue();
-    await practice.copyFieldText();
-    await expect(practice.field2).toHaveValue(originalText);
+    });
+    await page.getByRole('button', { name: 'Confirmation Alert', exact: true }).click();
+    await confirmDismissed;
+    await expect.soft(page.locator('#demo')).toHaveText('You pressed Cancel!');
   });
 
-  test('B2: hover over Point Me to reveal a menu option', async ({ practice }) => {
-    await expect(practice.mobilesOption).toBeHidden();
-    await practice.hoverOverPointMe();
-    await expect(practice.mobilesOption).toBeVisible();
+  await test.step("B6: Enter text in the prompt.", async () => {
+    const promptHandled = page.waitForEvent('dialog').then(async (dialog) => {
+      expect.soft(dialog.type()).toBe('prompt');
+      expect.soft(dialog.message()).toBe('Please enter your name:');
+      await dialog.accept('Taylor Example');
+    });
+    await page.getByRole('button', { name: 'Prompt Alert', exact: true }).click();
+    await promptHandled;
+    await expect.soft(page.locator('#demo')).toHaveText('Hello Taylor Example! How are you today?');
   });
 
-  test('B3: drag the element onto its target', async ({ practice }) => {
-    await expect(practice.dropTarget).toHaveText('Drop here');
-    await practice.dragToTarget();
-    await expect(practice.dropTarget).toHaveText('Dropped!');
-    await expect(practice.dropTarget).toHaveClass(/ui-state-highlight/);
+  await test.step("B7: Open and verify the new tab.", async () => {
+    const newTabPromise = page.waitForEvent('popup');
+    await page.getByRole('button', { name: 'New Tab', exact: true }).click();
+    const newTab = await newTabPromise;
+    await expect.soft(newTab).toHaveURL('https://www.pavantestingtools.com/');
+    await newTab.close();
   });
 
-  test('B4: handle the simple alert and verify its type and message', async ({ practice }) => {
-    const dialog = await respondToDialog(practice.page, practice.simpleAlert, 'accept');
-    expect(dialog.type).toBe('alert');
-    expect(dialog.message).toBe('I am an alert box!');
-  });
-
-  test('B5a: accept the confirmation and verify feedback', async ({ practice }) => {
-    const dialog = await respondToDialog(practice.page, practice.confirmationAlert, 'accept');
-    expect(dialog.type).toBe('confirm');
-    expect(dialog.message).toBe('Press a button!');
-    await expect(practice.dialogFeedback).toHaveText('You pressed OK!');
-  });
-
-  test('B5b: dismiss the confirmation and verify feedback', async ({ practice }) => {
-    const dialog = await respondToDialog(practice.page, practice.confirmationAlert, 'dismiss');
-    expect(dialog.type).toBe('confirm');
-    expect(dialog.message).toBe('Press a button!');
-    await expect(practice.dialogFeedback).toHaveText('You pressed Cancel!');
-  });
-
-  test('B6: enter fictional text in the prompt and verify feedback', async ({ practice }) => {
-    const name = 'Taylor Example';
-    const dialog = await respondToDialog(practice.page, practice.promptAlert, 'accept', name);
-    expect(dialog.type).toBe('prompt');
-    expect(dialog.message).toBe('Please enter your name:');
-    await expect(practice.dialogFeedback).toHaveText(`Hello ${name}! How are you today?`);
-  });
-
-  test('B7: capture the new tab and verify its destination', async ({ practice }) => {
-    const newTab = await practice.openNewTab();
-    try {
-      await expect(newTab).toHaveURL('https://www.pavantestingtools.com/');
-    } finally {
-      await newTab.close();
-    }
-  });
-
-  test('B8: select a sample file and verify its filename and upload feedback', async ({ practice }) => {
-    const filename = 'sample-upload.txt';
-    const filePath = resolve(__dirname, 'data', filename);
-    await practice.selectSampleFile(filePath);
-    const selectedNames = await practice.singleFileInput.evaluate(
-      (input: HTMLInputElement) => Array.from(input.files ?? [], file => file.name),
+  await test.step("B8: Select and upload the sample file.", async () => {
+    await page.locator('#singleFileInput').setInputFiles(
+      resolve(__dirname, 'data', 'sample-upload.txt'),
     );
-    expect(selectedNames).toEqual([filename]);
-    await practice.uploadSingleFile.click();
-    await expect(practice.uploadFeedback).toContainText(`Single file selected: ${filename}`);
-    await expect(practice.uploadFeedback).toContainText('Type: text/plain');
+    await expect.soft(page.locator('#singleFileInput')).toHaveValue(/sample-upload\.txt$/);
+    await page.getByRole('button', { name: 'Upload Single File', exact: true }).click();
+    await expect.soft(page.locator('#singleFileStatus')).toContainText('Single file selected: sample-upload.txt');
+    await expect.soft(page.locator('#singleFileStatus')).toContainText('Type: text/plain');
   });
 });
