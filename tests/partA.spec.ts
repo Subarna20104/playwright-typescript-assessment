@@ -1,8 +1,6 @@
 import { test, expect } from '../fixtures/practice.fixture';
-
 test('Part A — Form Interactions and Assertions', async ({ page, practice }) => {
   test.setTimeout(180_000);
-
   // A1: verify the page title and URL
   await expect.soft(
     page,
@@ -12,7 +10,6 @@ test('Part A — Form Interactions and Assertions', async ({ page, practice }) =
     page,
     'Page URL should match the practice website',
   ).toHaveURL('https://testautomationpractice.blogspot.com/');
-
   // A2: enter fictional details and verify all field values
   const details = {
     name: 'Alex Example',
@@ -37,7 +34,6 @@ test('Part A — Form Interactions and Assertions', async ({ page, practice }) =
     practice.address,
     'Address field should contain the entered address',
   ).toHaveValue(details.address);
-
   // A3: clear the name and enter a different name
   await practice.enterName('Alex Example');
   await expect.soft(

@@ -15,7 +15,7 @@ export default defineConfig({
   use: {
     headless: true,
     launchOptions: { slowMo },
-    screenshot: 'only-on-failure',
+    screenshot: { mode: 'on', fullPage: true },
     trace: 'retain-on-failure',
   },
   projects: [

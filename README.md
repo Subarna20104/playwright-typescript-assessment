@@ -102,4 +102,4 @@ tsconfig.json                 TypeScript configuration
 
 Tests use Chromium and require internet access to the practice website and the new-tab destination. Each part opens its own practice page and completes its exercises in order.
 
-Generated reports, test results, and `node_modules` are excluded from Git. Screenshots and traces are retained for failed tests.
+Generated reports, test results, and `node_modules` are excluded from Git. Full-page screenshots are captured for both passed and failed tests, including fields outside the visible viewport. Traces are retained for failed tests.
