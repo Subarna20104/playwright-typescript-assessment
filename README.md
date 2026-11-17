@@ -53,9 +53,9 @@ npx tsc --noEmit
 npm run report
 ```
 
-The shared `practice` fixture creates a `PracticePage` and opens the website once per test. Part B uses `test.beforeEach()` to read its initial ARIA snapshot. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. Part B’s `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
+The shared `practice` fixture creates a `PracticePage` and opens the website once per test. Both parts use `test.beforeEach()` to read their initial ARIA snapshots. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. Part B’s `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
 
-The HTML report includes both test cases and their assertions, plus Part B’s named steps, initial ARIA snapshot, and final screenshot. After running `npm test`, open it with `npm run report`.
+The HTML report includes both test cases and their assertions, plus an initial ARIA snapshot and full-page screenshot for each part and Part B’s named steps and additional final screenshot. After running `npm test`, open it with `npm run report`.
 
 ## Test coverage
 

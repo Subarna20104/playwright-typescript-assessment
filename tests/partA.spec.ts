@@ -1,4 +1,46 @@
 import { test, expect } from '../fixtures/practice.fixture';
+
+test.beforeEach(async ({ practice }, testInfo) => {
+
+  await test.step('Read and verify the default page ARIA snapshot', async () => {
+    const snapshot = await practice.body.ariaSnapshot();
+    await testInfo.attach('default-page-aria.yml', {
+      body: snapshot,
+      contentType: 'text/yaml',
+    });
+
+    // Verify stable default controls; dynamic table values change on every load.
+    await expect.soft(practice.body).toMatchAriaSnapshot(`
+      - banner:
+        - heading "Automation Testing Practice" [level=1]
+      - heading "Data Entry Form" [level=3]
+      - textbox "Enter Name"
+      - textbox "Enter EMail"
+      - textbox "Enter Phone"
+      - textbox "Address:"
+      - radio "Male"
+      - radio "Female"
+      - checkbox "Sunday"
+      - checkbox "Wednesday"
+      - checkbox "Saturday"
+      - combobox "Country:":
+        - option "United States" [selected]
+      - listbox "Colors:"
+      - heading "Upload Files" [level=2]
+      - button "Upload Single File"
+      - complementary:
+        - button "Simple Alert"
+        - button "Confirmation Alert"
+        - button "Prompt Alert"
+        - button "New Tab"
+        - button "Point Me"
+        - button "Copy Text"
+        - paragraph: Drag me to my target
+        - paragraph: Drop here
+    `);
+  });
+});
+
 test('Part A — Form Interactions and Assertions', async ({ page, practice }) => {
   test.setTimeout(180_000);
   // A1: verify the page title and URL
