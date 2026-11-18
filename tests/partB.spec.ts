@@ -1,7 +1,15 @@
 import { test, expect } from '../fixtures/practice.fixture';
 import { resolve } from 'node:path';
 
-test.beforeEach(async ({ practice }, testInfo) => {
+test.afterEach(async ({ page }, testInfo) => {
+  await testInfo.attach('final-page.png', {
+    body: await page.screenshot({ fullPage: true }),
+    contentType: 'image/png',
+  });
+});
+
+test('Part B — Interactive Controls', async ({ page, practice }, testInfo) => {
+  test.setTimeout(180_000);
 
   await test.step('Read and verify the default page ARIA snapshot', async () => {
     const snapshot = await practice.body.ariaSnapshot();
@@ -40,17 +48,7 @@ test.beforeEach(async ({ practice }, testInfo) => {
         - paragraph: Drop here
     `);
   });
-});
 
-test.afterEach(async ({ page }, testInfo) => {
-  await testInfo.attach('final-page.png', {
-    body: await page.screenshot({ fullPage: true }),
-    contentType: 'image/png',
-  });
-});
-
-test('Part B — Interactive Controls', async ({ page, practice }) => {
-  test.setTimeout(180_000);
   await test.step("B1: Double-click to copy text.", async () => {
     await practice.field1.fill('Fictional copy text');
     await practice.field2.fill('Previous value');

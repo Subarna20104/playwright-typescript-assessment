@@ -1,6 +1,6 @@
 # Playwright Assessment
 
-Automated tests for [Automation Testing Practice](https://testautomationpractice.blogspot.com/), written in TypeScript using Playwright Test. Each part runs in its own single test block, using a shared fixture, Page Object Model, simple ID and role locators, and soft assertions. Part B groups its exercises using `test.step()`.
+Automated tests for [Automation Testing Practice](https://testautomationpractice.blogspot.com/), written in TypeScript using Playwright Test. Each part runs in its own single test block, using a shared fixture, Page Object Model, simple ID and role locators, and soft assertions. Both parts group their exercises using `test.step()`.
 
 ## Setup
 
@@ -53,9 +53,9 @@ npx tsc --noEmit
 npm run report
 ```
 
-The shared `practice` fixture creates a `PracticePage` and opens the website once per test. Both parts use `test.beforeEach()` to read their initial ARIA snapshots. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. Part B’s `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
+The shared `practice` fixture creates a `PracticePage` and opens the website once per test. Both parts read their initial ARIA snapshots at the start of their tests. A soft ARIA assertion verifies the stable default controls. The complete snapshot is attached as `default-page-aria.yml`; changing dynamic table values are excluded from the assertion. Part B’s `test.afterEach()` attaches a final screenshot. Playwright closes the page automatically.
 
-The HTML report includes both test cases and their assertions, plus an initial ARIA snapshot and full-page screenshot for each part and Part B’s named steps and additional final screenshot. After running `npm test`, open it with `npm run report`.
+The HTML report includes both test cases and their assertions, plus an initial ARIA snapshot and full-page screenshot for each part and named steps for both parts and Part B’s additional final screenshot. After running `npm test`, open it with `npm run report`.
 
 ## Test coverage
 
